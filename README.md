@@ -2,7 +2,7 @@
 
 ## Overview
 * Fork and clone the repository
-* 
+* Work on assignments
 
 * Individual assignments
 
