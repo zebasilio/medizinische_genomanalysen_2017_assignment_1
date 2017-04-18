@@ -2,7 +2,19 @@
 
 '''
 To run the script, in addition to the imported modules, please install samtools and bedtools: sudo apt-get install bedtools; sudo apt-get install samtools
-Before running the script, change the path of the bam file in the bam variable (line 15)
+Before running the script, change the path of the bam file in the bam variable (line 27)
+to run the script, in the command line:
+$chmod +x assignment1
+$./assignment1 > assignment.txt 
+
+Running this script as mentioned above will produce the following files:
+mygene.txt
+proper_paired.txt 
+mapped_reads.txt
+assignment.txt (where the assigment summary will be written)  
+
+  
+
 '''
 import mysql.connector
 import pysam
@@ -73,7 +85,7 @@ class Assignment1:
     def get_sam_header(self):
         print ("\n+++++++++++++++++++\nSam Header:")
         header = []
-        for line in self.samfile.header:
+        for line in self.sam.header:
             print(line)
             header.append(line)
         return header
@@ -83,7 +95,7 @@ class Assignment1:
         print ("\n+++++++++++++++++++\nProperly paired reads of gene:")
 
 # call samtools via command line and save it in an extra file (samfile.txt)
-        cmd = ["samtools flagstat {} > proper_paired.txt".format(self.bam)]
+        cmd = ["samtools_0.1.18 flagstat {} > proper_paired.txt".format(self.bam)]
         subprocess.call(cmd, shell=True)
         file = open("proper_paired.txt", "r")
         rows = []
@@ -101,7 +113,7 @@ class Assignment1:
         print ("\n+++++++++++++++++++\nGene Reads with Indels:")
         read_count = 0
         reads = []
-        for read in self.samfile:
+        for read in self.sam:
             columns = str(read).split("\t")
             if "I" in str(columns[5]) or "D" in str(columns[5]):
                 read_count += 1
@@ -129,7 +141,7 @@ class Assignment1:
         print("\n+++++++++++++++++++\nGene Average Coverage:")
 
         bed = pybedtools.BedTool(self.bam)
-        coverage = bed.coverage(bg=True)
+        coverage = bed.genome_coverage(bg=True)
 
         line_count = 0 #number of regions
         total_coverage = 0 #added coverage across all regions
@@ -146,7 +158,7 @@ class Assignment1:
     def get_number_mapped_reads(self):
         print("\n+++++++++++++++++++\nNumber of Mapped Reads:")
         
-        cmd = ["samtools flagstat {} > mapped_reads.txt".format(self.bam)]
+        cmd = ["samtools_0.1.18 flagstat {} > mapped_reads.txt".format(self.bam)]
         subprocess.call(cmd, shell=True)
         file = open("mapped_reads.txt", "r")
         rows = []
@@ -180,7 +192,7 @@ class Assignment1:
 	
     
     def print_summary(self):
-        self.fetch_gene_coordinates("hg19", "MYGENE.TXT")
+        self.fetch_gene_coordinates("hg19", "mygene.txt")
         self.get_sam_header()
         self.get_properly_paired_reads_of_gene()	
         self.get_gene_reads_with_indels()
@@ -192,6 +204,6 @@ class Assignment1:
         self.get_number_of_exons()
 
 if __name__ == '__main__':
-    print("Assignment1")
-    assignment1 = Assignment1(bam)
+    print ("Assignment 1")
+    assignment1 = Assignment1()
     assignment1.print_summary()

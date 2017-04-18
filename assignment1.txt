@@ -1,0 +1,50 @@
+Assignment 1
+
++++++++++++++++++++
+Connecting to UCSC and Fetching Data:
+
++++++++++++++++++++
+Done Fetching Data:
+
++++++++++++++++++++
+Sam Header:
+CO
+HD
+SQ
+PG
+RG
+
++++++++++++++++++++
+Properly paired reads of gene:
+6315902
+
++++++++++++++++++++
+Gene Reads with Indels:
+107632
+
++++++++++++++++++++
+Total average coverage:
+5.61
+
++++++++++++++++++++
+Gene Average Coverage:
+5.48
+
++++++++++++++++++++
+Number of Mapped Reads:
+6396581
+
++++++++++++++++++++
+Gene Symbol:
+AMPD3
+
++++++++++++++++++++
+Region of Gene:
+Chromosome: chr11
+Start: 10482677
+End: 10529126
+
+
++++++++++++++++++++
+Number of Exons:
+15
