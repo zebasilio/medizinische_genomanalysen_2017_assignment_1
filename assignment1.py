@@ -1,26 +1,41 @@
-import mysql.connector
+#! /usr/bin/env python3
 
-__author__ = 'XXX'
+'''
+To run the script, in addition to the imported modules, please install samtools and bedtools: sudo apt-get install bedtools; sudo apt-get install samtools
+Before running the script, change the path of the bam file in the bam variable (line 15)
+'''
+import mysql.connector
+import pysam
+import pybedtools
+import subprocess
+
+
+__author__ = 'José Basílio'
+
+bam = '/home/jose/MedGenAn/HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam'
 
 
 class Assignment1:
-    
     def __init__(self):
-        ## Your gene of interest
-        self.gene = ""
+        #Gene of interest
+        self.gene = "AMPD3"
 
+	#give path of the bam file
+        self.bam = bam
+
+	#convert bam to sam:
+        self.sam = pysam.AlignmentFile(self.bam, 'rb')    
     
     def fetch_gene_coordinates(self, genome_reference, file_name):
+        print("\n+++++++++++++++++++\nConnecting to UCSC and Fetching Data:")
         
-        print "Connecting to UCSC to fetch data"
-        
-        ## Open connection
+        # Open connection
         cnx = mysql.connector.connect(host='genome-mysql.cse.ucsc.edu', user='genomep', passwd='password', db=genome_reference)
         
-        ## Get cursor
+        # Get cursor
         cursor = cnx.cursor()
         
-        ## Build query fields
+        # Build query fields
         query_fields = ["refGene.name2",
                         "refGene.name",
                         "refGene.chrom",
@@ -31,62 +46,152 @@ class Assignment1:
                         "refGene.exonStarts",
                         "refGene.exonEnds"]
         
-        ## Build query
+        # Build query
         query = "SELECT DISTINCT %s from refGene" % ",".join(query_fields)
         
-        ## Execute query
+        # Execute query
         cursor.execute(query)
         
-        ## Write to file
-        ## TODO this may need some work 
+        # Write to file
+        
+        self.gene_info = []
         with open(file_name, "w") as fh:
             for row in cursor:
-                fh.write(str(row) + "\n")
-    
-            
-        ## Close cursor & connection
+                if row[0] == "AMPD3":
+                    for attribute in row:
+                        fh.write(str(attribute) + "\n")
+                        self.gene_info.append(attribute)
+ 
+    	##Close cursor & connection
         cursor.close()
         cnx.close()
         
-        print "Done fetching data"
+        print("\n+++++++++++++++++++\nDone Fetching Data:")
+        
+    	# get header of whole file
                 
     def get_sam_header(self):
-        print "todo"
+        print ("\n+++++++++++++++++++\nSam Header:")
+        header = []
+        for line in self.samfile.header:
+            print(line)
+            header.append(line)
+        return header
+
         
     def get_properly_paired_reads_of_gene(self):
-        print "todo"
-        
+        print ("\n+++++++++++++++++++\nProperly paired reads of gene:")
+
+# call samtools via command line and save it in an extra file (samfile.txt)
+        cmd = ["samtools flagstat {} > proper_paired.txt".format(self.bam)]
+        subprocess.call(cmd, shell=True)
+        file = open("proper_paired.txt", "r")
+        rows = []
+        for row in file:
+            rows.append(row)
+        target_row = rows[6]
+        properly_paired_reads = target_row.split(" ")[0]
+    
+        print(properly_paired_reads)
+        return properly_paired_reads
+
+#Specifies and returns the number of reads with indels
+	
     def get_gene_reads_with_indels(self):
-        print "todo"
+        print ("\n+++++++++++++++++++\nGene Reads with Indels:")
+        read_count = 0
+        reads = []
+        for read in self.samfile:
+            columns = str(read).split("\t")
+            if "I" in str(columns[5]) or "D" in str(columns[5]):
+                read_count += 1
+                reads.append(read)
+        print(read_count)
+        return reads
         
     def calculate_total_average_coverage(self):
-        print "todo"
-        
+        print("\n+++++++++++++++++++\nTotal average coverage:")
+        bed = pybedtools.BedTool(self.bam)
+        coverage = bed.genome_coverage(bg=True)
+        line_count = 0 #number of regions
+        total_coverage = 0 #added coverage across all regions
+        for line in coverage:
+            line_count += 1
+            total_coverage += int(line[3])
+
+        total_average_coverage = total_coverage / line_count
+        print("%.2f" % round(total_average_coverage,2))
+        return total_average_coverage
+
+
+
     def calculate_gene_average_coverage(self):
-        print "todo"
+        print("\n+++++++++++++++++++\nGene Average Coverage:")
+
+        bed = pybedtools.BedTool(self.bam)
+        coverage = bed.coverage(bg=True)
+
+        line_count = 0 #number of regions
+        total_coverage = 0 #added coverage across all regions
+        for line in coverage:
+            if int(line[1]) >= int(self.gene_info[3]) and int(line[2]) <= int(self.gene_info[4]):
+                line_count += 1
+                total_coverage += int(line[3])
+                
+        gene_average_coverage = total_coverage / line_count
+        print("%.2f" % round(gene_average_coverage,2))
+        return gene_average_coverage
+        
         
     def get_number_mapped_reads(self):
-        print "todo"
+        print("\n+++++++++++++++++++\nNumber of Mapped Reads:")
+        
+        cmd = ["samtools flagstat {} > mapped_reads.txt".format(self.bam)]
+        subprocess.call(cmd, shell=True)
+        file = open("mapped_reads.txt", "r")
+        rows = []
+        for row in file:
+            rows.append(row)
+        target_row = rows[2]
+        number_mapped_reads = target_row.split (" ")[0]
+
+        print(number_mapped_reads)
+        return number_mapped_reads
+	
         
     def get_gene_symbol(self):
-        print "todo"
+        print("\n+++++++++++++++++++\nGene Symbol:")
+	
+        print(self.gene_info[0])
+        return self.gene_info[0]
         
     def get_region_of_gene(self):
-        print "ads"
+        print("\n+++++++++++++++++++\nRegion of Gene:")
+        
+        print("Chromosome: {}\nStart: {}\nEnd: {}\n".format(self.gene_info[2], self.gene_info[3], self.gene_info[4]))
+        return [self.gene_info[2], self.gene_info[3], self.gene_info[3], self.gene_info[4]]
         
     def get_number_of_exons(self):
-        print "ads"
+        print("\n+++++++++++++++++++\nNumber of Exons:")
+
+        print(self.gene_info[6])
+        return self.gene_info[6]
+
+	
     
     def print_summary(self):
-        print "Print all results here"
-    
-        
-if __name__ == '__main__':
-    print "Assignment 1"
-    assignment1 = Assignment1()
-    assignment1.print_summary()
-    
-    assignment1.fetch_gene_coordinates("hg19", "MYFILE.TXT") ## TODO change filename
-    
-    
+        self.fetch_gene_coordinates("hg19", "MYGENE.TXT")
+        self.get_sam_header()
+        self.get_properly_paired_reads_of_gene()	
+        self.get_gene_reads_with_indels()
+        self.calculate_total_average_coverage()
+        self.calculate_gene_average_coverage()
+        self.get_number_mapped_reads()
+        self.get_gene_symbol()
+        self.get_region_of_gene()
+        self.get_number_of_exons()
 
+if __name__ == '__main__':
+    print("Assignment1")
+    assignment1 = Assignment1(bam)
+    assignment1.print_summary()
