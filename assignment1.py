@@ -4,8 +4,8 @@
 To run the script, in addition to the imported modules, please install samtools and bedtools: sudo apt-get install bedtools; sudo apt-get install samtools
 Before running the script, change the path of the bam file in the bam variable (line 27)
 to run the script, in the command line:
-$chmod +x assignment1
-$./assignment1 > assignment.txt 
+$chmod +x assignment1.py
+$./assignment1.py > assignment.txt 
 
 Running this script as mentioned above will produce the following files:
 mygene.txt
