@@ -9,8 +9,7 @@ $./assignment1.py > assignment.txt
 
 Running this script as mentioned above will produce the following files:
 mygene.txt
-proper_paired.txt 
-mapped_reads.txt
+flagstat.txt
 assignment.txt (where the assigment summary will be written)  
 
   
@@ -95,7 +94,7 @@ class Assignment1:
         print ("\n+++++++++++++++++++\nProperly paired reads of gene:")
 
 # call samtools via command line and save it in an extra file (samfile.txt)
-        cmd = ["samtools_0.1.18 flagstat {} > proper_paired.txt".format(self.bam)]
+        cmd = ["samtools_0.1.18 flagstat {} > flagstat.txt".format(self.bam)]
         subprocess.call(cmd, shell=True)
         file = open("proper_paired.txt", "r")
         rows = []
@@ -158,9 +157,9 @@ class Assignment1:
     def get_number_mapped_reads(self):
         print("\n+++++++++++++++++++\nNumber of Mapped Reads:")
         
-        cmd = ["samtools_0.1.18 flagstat {} > mapped_reads.txt".format(self.bam)]
-        subprocess.call(cmd, shell=True)
-        file = open("mapped_reads.txt", "r")
+        #cmd = ["samtools_0.1.18 flagstat {} > mapped_reads.txt".format(self.bam)]
+        #subprocess.call(cmd, shell=True)
+        file = open("flagstat.txt", "r")
         rows = []
         for row in file:
             rows.append(row)
