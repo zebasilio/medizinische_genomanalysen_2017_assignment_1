@@ -8,11 +8,11 @@ Done Fetching Data:
 
 +++++++++++++++++++
 Sam Header:
-CO
 HD
-SQ
-PG
 RG
+PG
+CO
+SQ
 
 +++++++++++++++++++
 Properly paired reads of gene:

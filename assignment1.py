@@ -96,7 +96,7 @@ class Assignment1:
 # call samtools via command line and save it in an extra file (samfile.txt)
         cmd = ["samtools_0.1.18 flagstat {} > flagstat.txt".format(self.bam)]
         subprocess.call(cmd, shell=True)
-        file = open("proper_paired.txt", "r")
+        file = open("flagstat.txt", "r")
         rows = []
         for row in file:
             rows.append(row)
