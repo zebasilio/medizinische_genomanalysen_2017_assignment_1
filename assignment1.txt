@@ -9,13 +9,17 @@ Done Fetching Data:
 +++++++++++++++++++
 Sam Header:
 HD
-RG
-PG
 CO
 SQ
+RG
+PG
 
 +++++++++++++++++++
-Properly paired reads of gene:
+properly paired reads of gene:
+2245
+
++++++++++++++++++++
+Properly paired reads:
 6315902
 
 +++++++++++++++++++

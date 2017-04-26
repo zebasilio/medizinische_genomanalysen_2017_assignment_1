@@ -5,12 +5,13 @@ To run the script, in addition to the imported modules, please install samtools 
 Before running the script, change the path of the bam file in the bam variable (line 27)
 to run the script, in the command line:
 $chmod +x assignment1.py
-$./assignment1.py > assignment.txt 
+$./assignment1.py > assignment1.txt 
 
 Running this script as mentioned above will produce the following files:
 mygene.txt
+gene_proper_paired_reads.txt
 flagstat.txt
-assignment.txt (where the assigment summary will be written)  
+assignment1.txt (where the assigment summary will be written)  
 
   
 
@@ -89,11 +90,38 @@ class Assignment1:
             header.append(line)
         return header
 
-        
-    def get_properly_paired_reads_of_gene(self):
-        print ("\n+++++++++++++++++++\nProperly paired reads of gene:")
+        gene_proper_paired_reads.txt
 
-# call samtools via command line and save it in an extra file (samfile.txt)
+ # http://pysam.readthedocs.io/en/latest/api.html
+    # For the function, .bam file will be indexed (samtools index HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam ) and the proper paired reads of the gene will be written into a new  file "gene_proper_paired_reads.txt"
+    def get_properly_paired_reads_of_gene(self):
+        print ("\n+++++++++++++++++++\nproperly paired reads of gene:")
+        # call samtools via command line; indexes the bam file
+        cmd = ["samtools_0.1.18 index {}".format(self.bam)]
+        subprocess.call(cmd, shell=True)
+        samfile = pysam.AlignmentFile(self.bam, "rb")
+        properpairedreads = pysam.AlignmentFile("gene_proper_paired_reads.txt", "w", template=samfile)
+        for read in samfile.fetch("11", self.gene_info[3], self.gene_info[4]):
+            if read.is_proper_pair:
+             		properpairedreads.write(read)
+        samfile.close()
+        #counts the number of properly_paired_reads_of_gene and prints it
+        file = open("gene_proper_paired_reads.txt", "r")
+        read_count = 0
+        reads = []
+        for line in file:
+            if line.startswith("SRR"):
+               read_count += 1
+               reads.append(line)
+        print(read_count)
+        return read_count
+        
+        
+
+    def get_properly_paired_reads(self):
+        print ("\n+++++++++++++++++++\nProperly paired reads:")
+
+# call samtools via command line and save it in an extra file (flagsat.txt)
         cmd = ["samtools_0.1.18 flagstat {} > flagstat.txt".format(self.bam)]
         subprocess.call(cmd, shell=True)
         file = open("flagstat.txt", "r")
@@ -106,7 +134,7 @@ class Assignment1:
         print(properly_paired_reads)
         return properly_paired_reads
 
-#Specifies and returns the number of reads with indels
+#Specifies and returns the number of reads with indels, CIGAR field either as I (Insert) or D (Delition)
 	
     def get_gene_reads_with_indels(self):
         print ("\n+++++++++++++++++++\nGene Reads with Indels:")
@@ -156,9 +184,6 @@ class Assignment1:
         
     def get_number_mapped_reads(self):
         print("\n+++++++++++++++++++\nNumber of Mapped Reads:")
-        
-        #cmd = ["samtools_0.1.18 flagstat {} > mapped_reads.txt".format(self.bam)]
-        #subprocess.call(cmd, shell=True)
         file = open("flagstat.txt", "r")
         rows = []
         for row in file:
@@ -193,7 +218,8 @@ class Assignment1:
     def print_summary(self):
         self.fetch_gene_coordinates("hg19", "mygene.txt")
         self.get_sam_header()
-        self.get_properly_paired_reads_of_gene()	
+        self.get_properly_paired_reads_of_gene()
+        self.get_properly_paired_reads()	
         self.get_gene_reads_with_indels()
         self.calculate_total_average_coverage()
         self.calculate_gene_average_coverage()
