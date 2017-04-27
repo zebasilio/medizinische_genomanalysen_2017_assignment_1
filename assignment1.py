@@ -84,13 +84,10 @@ class Assignment1:
                 
     def get_sam_header(self):
         print ("\n+++++++++++++++++++\nSam Header:")
-        header = []
-        for line in self.sam.header:
-            print(line)
-            header.append(line)
-        return header
+        cmd = ["samtools_0.1.18 view -H {}".format(self.bam)]
+        subprocess.call(cmd, shell=True)
+        print()
 
-        gene_proper_paired_reads.txt
 
  # http://pysam.readthedocs.io/en/latest/api.html
     # For the function, .bam file will be indexed (samtools index HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam ) and the proper paired reads of the gene will be written into a new  file "gene_proper_paired_reads.txt"
