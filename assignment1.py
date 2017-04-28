@@ -5,13 +5,16 @@ To run the script, in addition to the imported modules, please install samtools 
 Before running the script, change the path of the bam file in the bam variable (line 27)
 to run the script, in the command line:
 $chmod +x assignment1.py
-$./assignment1.py > assignment1.txt 
+$./assignment1.py 
 
 Running this script as mentioned above will produce the following files:
 mygene.txt
 gene_proper_paired_reads.txt
 flagstat.txt
-assignment1.txt (where the assigment summary will be written)  
+
+
+The output is saved in assignment1.txt
+  
 
   
 
@@ -106,12 +109,13 @@ class Assignment1:
         file = open("gene_proper_paired_reads.txt", "r")
         read_count = 0
         reads = []
-        for line in file:
-            if line.startswith("SRR"):
+        for read in file:
+            if read.startswith("SRR"):
                read_count += 1
-               reads.append(line)
+               reads.append(read)
         print(read_count)
         return read_count
+        
         
         
 
@@ -217,7 +221,10 @@ class Assignment1:
     def print_summary(self):
         self.fetch_gene_coordinates("hg19", "mygene.txt")
         self.get_sam_header()
-        self.get_properly_paired_reads_of_gene()
+        self.get_properly_paired_reads_of_gene()#2245 (checking the file "gene_proper_paired_reads.txt", 
+                                                #it is possible to see that there are 2252 lines which begin with "SRR".
+                                                #Also, if we excecute in the command line 
+                                            #"$ cat gene_proper_paired_reads.txt | grep -e "SRR" | wc -l", the result is 2252)
         self.get_properly_paired_reads()	
         self.get_gene_reads_with_indels()
         self.calculate_total_average_coverage()
