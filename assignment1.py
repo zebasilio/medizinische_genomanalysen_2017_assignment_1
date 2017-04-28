@@ -137,13 +137,15 @@ class Assignment1:
         print ("\n+++++++++++++++++++\nGene Reads with Indels:")
         read_count = 0
         reads = []
-        for read in self.sam:
+        for read in self.sam.fetch("11", self.gene_info[3], self.gene_info[4]):
             columns = str(read).split("\t")
             if "I" in str(columns[5]) or "D" in str(columns[5]):
                 read_count += 1
                 reads.append(read)
         print(read_count)
         return reads
+        
+        
         
     def calculate_total_average_coverage(self):
         print("\n+++++++++++++++++++\nTotal average coverage:")
